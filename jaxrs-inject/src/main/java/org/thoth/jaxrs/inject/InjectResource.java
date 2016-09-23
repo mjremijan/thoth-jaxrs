@@ -9,11 +9,6 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.SecurityContext;
 
-/**
- * REST Web Service
- *
- * @author Michael Remijan mjremijan@yahoo.com @mjremijan
- */
 @Path("inject")
 public class InjectResource {
 
@@ -31,5 +26,4 @@ public class InjectResource {
         retval += String.format("<p>injectMe=[%s]</p>\n", injectMe);
         return retval;
     }
-
 }
