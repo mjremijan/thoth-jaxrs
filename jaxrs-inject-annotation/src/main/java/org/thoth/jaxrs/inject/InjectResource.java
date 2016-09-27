@@ -1,6 +1,7 @@
 package org.thoth.jaxrs.inject;
 
 import java.security.Principal;
+import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -10,6 +11,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.SecurityContext;
 
 @Path("inject")
+@RequestScoped
 public class InjectResource {
 
     @Inject
@@ -22,7 +24,8 @@ public class InjectResource {
         String retval = "";
         retval += "<!DOCTYPE html>\n";
         retval += "<h3>Thoth</h3>\n";
-        retval += "<h4>jaxrs-inject</h4>\n";
+        retval += "<h4>jaxrs-inject-annotation</h4>\n";
+        retval += String.format("<p>this=[%s]</p>\n", this);
         retval += String.format("<p>injectMe=[%s]</p>\n", injectMe);
         return retval;
     }
