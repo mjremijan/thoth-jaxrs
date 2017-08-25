@@ -1,0 +1,142 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition 
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:f="http://xmlns.jcp.org/jsf/core"
+    template="../WEB-INF/template_index.xhtml">
+
+    <ui:define name="page_name">Index</ui:define>
+
+    <ui:define name="test_goals">
+        <p>
+            Can a JAX-RS filter and custom <code>SecurityContext</code> protect
+            a JAX-RS endpoint which is NOT an EJB using
+            <code>@RolesAllowed</code>, <code>@DeclaredRoles</code>, and identity management
+            groups in <code>glassfish-web.xml</code>?
+        </p>
+    </ui:define>
+
+    <ui:define name="test_results">
+        <p>
+            <b style="color:red;">!!! CAUTION !!!</b>
+        </p>
+        <blockquote>
+            <p>
+                <b>Jersey specific</b> code - 
+                <code>org.glassfish.jersey.server.ResourceConfig, org.glassfish.jersey.server.filter.RolesAllowedDynamicFeature</code>
+                - is required for this solution.                
+            </p>
+        </blockquote>
+        
+        
+        <p>
+            <b>No!</b>
+        </p>
+        <blockquote>
+            <p>
+                Using a custom <code>SecurityContext</code> to protect
+                a JAX-RS endpoint fails when it comes to the separation
+                between application-specific roles and identity-management
+                groups.  Unless you code it yourself as part of your
+                custom <code>SecurityContext</code>, the mapping between 
+                what your code would use from <code>@DeclaredRoles</code>
+                and the identity-managment groups in <code>glassfish-web.xml</code>
+                won't occur.  I guess you could code this yourself,
+                but then you have GlassFish-specific code in your application.
+            </p>
+            <p>
+                JASPIC handles this mapping for you! With JASPIC, its code would
+                load the identity-management group names (since this is the
+                information you receive about your user from your identity
+                management solution) and your application can use what it
+                wants from  <code>@DeclaredRoles</code> assuming the
+                mapping in <code>glassfish-web.xml</code> is correct.
+            </p>
+            <p>
+                So this is a bummer :(
+            </p>
+        </blockquote>
+        
+        
+        <p>
+            <b>Yes!</b>
+        </p>
+        <blockquote>
+            <p>
+                Aside from not having mapping between application-specific roles and identity-management
+                groups, the <code>@RolesAllowed</code> will work, provided you use some Jersey-specific
+                configuration.   
+            </p>
+            <p>
+                Here are some links. Click to test.                
+            </p>
+            <p>
+                <h:outputLink value="#{request.contextPath}/rest/customersupport/help">
+                    Good link: Customer support help REST resource...you have GROUP_CUSTOMER_SUPPORTS :)
+                </h:outputLink>
+            </p>
+            <p>
+                <h:outputLink value="#{request.contextPath}/rest/executive/contract">
+                    Bad link: Executive contract details...you don't have GROUP_EXECUTIVES :)
+                </h:outputLink>
+            </p>
+        </blockquote>
+        
+        <p>
+            <b>ResourceConfig</b>
+        </p>
+        <blockquote>
+            <p>
+                First, you need to configure the application using a <b>Jersey specific</b> class.
+                This is bad because a JAX-RS implementation detail has leaked into your application.                
+            </p>
+            <p>
+                @see <code>org.thoth.jersey.server.MyResourceConfig</code>.
+            </p>
+        </blockquote>
+        
+        <p>
+            <b>MyPrincipal</b>
+        </p>
+        <blockquote>
+            <p>
+                Next, you need a <a>java.security.Principal</a> implementation.
+            </p>
+            <p>
+                @see <code>org.thoth.jaxrs.security.principal.MyPrincipal</code>.
+            </p>
+        </blockquote>
+        
+        <p>
+            <b>MySecurityContext</b>
+        </p>
+        <blockquote>
+            <p>
+                Next, you need a <a>javax.ws.rs.core.SecurityContext</a> implementation.
+            </p>
+            <p>
+                @see <code>org.thoth.jaxrs.security.context.MySecurityContext</code>.
+            </p>
+        </blockquote>
+        
+        
+        <p>
+            <b>MyAuthenticationFilter</b>
+        </p>
+        <blockquote>
+            <p>
+                Next, you need a <a>javax.ws.rs.container.ContainerRequestFilter</a> implementation.
+            </p>
+            <p>
+                <b>NOTE:</b> Don't forget the <code>@Provider @PreMatching</code> annotations on this class!
+            </p>
+            <p>
+                @see <code>org.thoth.jaxrs.security.filter.MyAuthenticationFilter</code>.
+            </p>
+        </blockquote>
+
+    </ui:define>
+
+</ui:composition>

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Start Page</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    </head>
+    <body>
+        <h3>01-jaxrs-inject-annotation</h3>
+
+        <h4>Test Goal</h4>
+        <blockquote>
+            <p>
+                Can <code>@Inject</code> be used to inject a bean
+                into a JAX-RS endpoint if the project does <b>NOT</b>
+                have a <code>beans.xml</code> file?
+            </p>
+        </blockquote>
+
+
+        <h4>Test Results</h4>
+        <blockquote>
+            <p>
+                <b style="color: red;">!! CAUTION !!</b>
+            </p>
+            <p>
+                When deploying to GlassFish 5, there is an
+                <b>Implicit CDI</b> checkbox which I think
+                will accomplish the same thing as having
+                a <code>beans.xml</code> file.  This is
+                a GlassFish specific feature though, and
+                should not be relied on for proper EE development.
+            </p>
+            <p>
+                <b>NO!</b>
+            </p>
+            <p>
+                Here is a link to test <code>@Inject</code>.  
+                Without a <code>beans.xml</code> file, clicking
+                the link will result in a <code>UnsatisfiedDependencyException</code>.
+            </p>
+            <p>
+                <a href="webresources/inject">Test inject</a>
+            </p>
+        </blockquote>
+
+    </body>
+</html>

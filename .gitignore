@@ -1,2 +1,7 @@
 /jaxrs-inject-annotation/target/
 /jaxrs-inject-beansxml/target/
+/01-jaxrs-inject-annotation/target/
+/02-jaxrs-inject-beansxmll/target/
+/02-jaxrs-inject-beansxml/target/
+/03-jaxrs-protected-customsecuritycontext-non_ejb-endpoint/target/
+/03-jaxrs-protected-customsecuritycontext-ejb-endpoint/target/

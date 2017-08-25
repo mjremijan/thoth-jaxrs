@@ -1,0 +1,81 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition 
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:f="http://xmlns.jcp.org/jsf/core"
+    template="../WEB-INF/template_index.xhtml">
+
+    <ui:define name="page_name">Index</ui:define>
+
+    <ui:define name="test_goals">
+        <p>
+            Can a JAX-RS filter and custom <code>SecurityContext</code> protect
+            a JAX-RS endpoint which <b>IS</b> an EJB using
+            <code>@RolesAllowed</code>, <code>@DeclaredRoles</code>, and identity management
+            groups in <code>glassfish-web.xml</code>?
+        </p>
+    </ui:define>
+
+    <ui:define name="test_results">
+        <p>
+            <b>No!</b>
+        </p>
+        <blockquote>
+            <p>
+                This is an attempt to not have jersey-specific code in the
+                application in the hopes that the custom <code>SecurityContext</code>
+                is used by the EJB.  Unfortunately, this doesn't seem to be
+                the case.  
+            </p>
+            <p>
+                First, there are 3 JAX-RS REST endpoints in this project.  All
+                of them are <code>@Stateless</code> EJBs.  They are:
+            </p>
+            <ol>
+                <li><code>CustomerSupportResource</code></li>
+                <li><code>ExecutiveResource</code></li>
+                <li><code>SecurityContextResource</code></li>
+            </ol>
+            <p>
+                To verify the JAX-RS REST endpoint calls are being
+                intercepted by the filter and a custom <code>SecurityContext</code>
+                is being created and roles assigned, you can click on this
+                unprotected link and see the custom <code>SecurityContext</code>
+                details:
+            </p>
+            <blockquote>
+                <p>
+                    <h:outputLink value="#{request.contextPath}/standard/securityContext/details">
+                        Unprotected SecurityContext details...
+                    </h:outputLink>
+                </p>
+            </blockquote>
+            <p>
+                If I configure JAX-RS with a standard <code>javax.ws.rs.core.Application</code>,
+                Then none of the links work.  
+            </p>
+            <p>
+                <h:outputLink value="#{request.contextPath}/jersey/customersupport/help">
+                    Jersey link: Customer support help REST resource...
+                </h:outputLink>
+            </p>
+            <p>
+                <h:outputLink value="#{request.contextPath}/standard/customersupport/help">
+                    Standard link: Customer support help REST resource...you have GROUP_CUSTOMER_SUPPORTS :)
+                </h:outputLink>
+            </p>
+            <p>
+                <h:outputLink value="#{request.contextPath}/jersey/executive/contract">
+                    Jersey link: Executive contract details...
+                </h:outputLink>
+            </p>
+            <p>
+                <h:outputLink value="#{request.contextPath}/standard/executive/contract">
+                    Standard link: Executive contract details...
+                </h:outputLink>
+            </p>
+        </blockquote>
+    </ui:define>
+</ui:composition>
