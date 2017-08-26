@@ -53,28 +53,171 @@
                 </p>
             </blockquote>
             <p>
-                If I configure JAX-RS with a standard <code>javax.ws.rs.core.Application</code>,
-                Then none of the links work.  
+                Now let's take a look at the other links.  None of the links work :(.  I've 
+                provided an explaination for each.  I'm not sure if the explaination
+                is correct, but it's the best I can figure out.
             </p>
-            <p>
-                <h:outputLink value="#{request.contextPath}/jersey/customersupport/help">
-                    Jersey link: Customer support help REST resource...
-                </h:outputLink>
-            </p>
+
+            <table class="order-table">
+                <thead>
+                    <tr>
+                        <th class="order-table-header" scope="col">LINK</th>
+                        <th class="order-table-header" scope="col">DOES IT WORK?</th>
+                        <th class="order-table-header" scope="col">WHY?</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="order-table-odd-row">
+                        <td>
+                            <!-- column header -->
+                            <!-- row record -->
+                            <h:outputLink value="#{request.contextPath}/jersey/executive/contract">
+                                Executive REST Service...<br/><br/>(Jersey config)
+                            </h:outputLink>
+                        </td>
+                        <td style="background-color: green;">
+                            YES
+                        </td>
+                        <td>
+                            <!-- column header -->
+                            <!-- row record -->
+                            <p>
+                                This link calls the Executive REST service to get 
+                                contract details. It is protected by 
+                                <code>@RolesAllowed({"GROUP_EXECUTIVES"})</code>.  You
+                                do <b>not</b> have this role, so you should <b>not</b> be able
+                                to access it.
+                            </p>
+                            <p>I say this link works because when you click it you
+                                get a 403 - Forbidden HTTP error code, and I think this
+                                is correct.
+                            </p>
+                            <p>
+                                So here is what I think is going on...
+                            </p>
+                            <p>
+                                This link uses the Jersey-specific application configuration 
+                                (<code>org.glassfish.jersey.server.ResourceConfig</code>)
+                                which does <code>register(RolesAllowedDynamicFeature.class);</code>.
+                                So I think this is working as expected because this 
+                                Jersey-specific configuration is protecting the REST call and
+                                not allowing you to access it.
+                            </p>
+                              
+                        </td>
+                    </tr>
+                    
+                    
+                    
+                    <tr class="order-table-even-row">
+                        <td>
+                            <!-- column header -->
+                            <!-- row record -->
+                            <h:outputLink value="#{request.contextPath}/jersey/customersupport/help">
+                                CustomerSupport REST Service...<br/><br/>(Jersey config)
+                            </h:outputLink>
+                        </td>
+                        <td style="background-color: red;">
+                            NO
+                        </td>
+                        <td>
+                            <!-- column header -->
+                            <!-- row record -->
+                            <p>
+                                This link calls the CustomerSupport REST service to get 
+                                help details. It is protected by 
+                                <code>@RolesAllowed({"GROUP_CUSTOMER_SUPPORTS"})</code>.
+                                You <b>have</b> this role, so you <b>should</b> be able to
+                                access it.
+                            </p>
+                            <p>
+                                I say this link is not working because when you click it
+                                you get an 500 - Internal Server Error code caused by
+                                an <code>javax.ejb.EJBAccessException</code>. This isn't
+                                right.  You should be able to access this because you
+                                have the right role.
+                            </p>
+                            <p>
+                                So here is what I think is going on...
+                            </p>
+                            <p>
+                                1st, this link uses the Jersey-specific application configuration 
+                                (<code>org.glassfish.jersey.server.ResourceConfig</code>)
+                                which does <code>register(RolesAllowedDynamicFeature.class);</code>.
+                                I think this Jersey-specific configuration is allowing 
+                                you access to the REST service because you have the
+                                GROUP_CUSTOMER_SUPPORTS role.  You don't get the 
+                                403 - Forbidden HTTP error code like with the Executive
+                                REST service.<br/><br/>
+                                
+                                2nd, however this call still fails with an 
+                                <code>javax.ejb.EJBAccessException</code>.  I think 
+                                that after getting past the Jersey-specific configuration,
+                                the call is then passed off to the EJB container. But
+                                because the custom <code>SecurityContext</code> is
+                                created in a JAX-RS filter, this context isn't 
+                                propegated correctly to the EJB container, so the
+                                EJB container fails the call with an 
+                                <code>javax.ejb.EJBAccessException</code>.
+                            </p>
+                              
+                        </td>
+                    </tr>
+                    
+                    
+                    <tr class="order-table-odd-row">
+                        <td>
+                            <!-- column header -->
+                            <!-- row record -->
+                            <h:outputLink value="#{request.contextPath}/standard/executive/contract">
+                                Standard link: Executive contract details...
+                            </h:outputLink>
+                        </td>
+                        <td style="background-color: yellow;">
+                            Maybe
+                        </td>
+                        <td>
+                            <!-- column header -->
+                            <!-- row record -->
+                            <p>
+                                This link calls the Executive REST service to get 
+                                contract details. It is protected by 
+                                <code>@RolesAllowed({"GROUP_EXECUTIVES"})</code>.  You
+                                do not have this role, so you should not be able
+                                to access it.
+                            </p>
+                            <p>I say this link maybe working because when you click it you
+                                get a 500 - Internal Server Error code caused by
+                                an <code>javax.ejb.EJBAccessException</code>.  I just don't 
+                                know if this exception is being thrown in the proper
+                                way.  I suspect it's not working correctly because of
+                                the XXXXXXX test below.
+                            </p>
+                            <p>
+                                This link uses the Standard application configuration
+                                (javax.ws.rs.core.Application)
+                                which doesn't do anything special.
+                            </p>
+                              
+                        </td>
+                    </tr>
+                    
+                    
+                </tbody>
+            </table>
+
+
+            
             <p>
                 <h:outputLink value="#{request.contextPath}/standard/customersupport/help">
                     Standard link: Customer support help REST resource...you have GROUP_CUSTOMER_SUPPORTS :)
                 </h:outputLink>
             </p>
             <p>
-                <h:outputLink value="#{request.contextPath}/jersey/executive/contract">
-                    Jersey link: Executive contract details...
-                </h:outputLink>
+                
             </p>
             <p>
-                <h:outputLink value="#{request.contextPath}/standard/executive/contract">
-                    Standard link: Executive contract details...
-                </h:outputLink>
+                
             </p>
         </blockquote>
     </ui:define>
