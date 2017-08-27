@@ -72,11 +72,11 @@
                             <!-- column header -->
                             <!-- row record -->
                             <h:outputLink value="#{request.contextPath}/jersey/executive/contract">
-                                Executive REST Service...<br/><br/>(Jersey config)
+                                Executive REST Service...<br/><br/>(Jersey-specific Config)
                             </h:outputLink>
                         </td>
-                        <td style="background-color: green;">
-                            YES
+                        <td style="background-color: yellow;">
+                            Maybe, see "Final Thoughts" below
                         </td>
                         <td>
                             <!-- column header -->
@@ -114,7 +114,7 @@
                             <!-- column header -->
                             <!-- row record -->
                             <h:outputLink value="#{request.contextPath}/jersey/customersupport/help">
-                                CustomerSupport REST Service...<br/><br/>(Jersey config)
+                                CustomerSupport REST Service...<br/><br/>(Jersey-specific Config)
                             </h:outputLink>
                         </td>
                         <td style="background-color: red;">
@@ -170,11 +170,11 @@
                             <!-- column header -->
                             <!-- row record -->
                             <h:outputLink value="#{request.contextPath}/standard/executive/contract">
-                                Standard link: Executive contract details...
+                                Executive REST Service...<br/><br/>(Standard Config)
                             </h:outputLink>
                         </td>
                         <td style="background-color: yellow;">
-                            Maybe
+                            Maybe, see "Final Thoughts" below
                         </td>
                         <td>
                             <!-- column header -->
@@ -183,41 +183,119 @@
                                 This link calls the Executive REST service to get 
                                 contract details. It is protected by 
                                 <code>@RolesAllowed({"GROUP_EXECUTIVES"})</code>.  You
-                                do not have this role, so you should not be able
+                                do <b>not</b> have this role, so you should <b>not</b> be able
                                 to access it.
                             </p>
-                            <p>I say this link maybe working because when you click it you
-                                get a 500 - Internal Server Error code caused by
-                                an <code>javax.ejb.EJBAccessException</code>.  I just don't 
-                                know if this exception is being thrown in the proper
-                                way.  I suspect it's not working correctly because of
-                                the XXXXXXX test below.
+                            <p>I say this link works because when you click it you
+                                get an 500 - Internal Server Error code caused by
+                                an <code>javax.ejb.EJBAccessException</code>.  I 
+                                think this is correct.  
                             </p>
                             <p>
-                                This link uses the Standard application configuration
-                                (javax.ws.rs.core.Application)
-                                which doesn't do anything special.
+                                So here is what I think is going on...
                             </p>
-                              
+                            <p>
+                                This link uses the standard JAX-RS configuration 
+                                (<code>javax.ws.rs.core.Application</code>).  I know
+                                that standard JAX-RS does not support <code>@RolesAllowed</code> 
+                                (which is why Jersey-specific configuration is needed to 
+                                support it).  So without the Jersey-specific code, JAX-RS
+                                basically ignores the security.<br/><br/>
+                                
+                                However, the Executive REST service is also a
+                                <code>@Stateless</code> EJB.  The EJB container 
+                                definatley supports <code>@RolesAllowed</code>. 
+                                So, when the EJB container tries to execute the 
+                                method it figures out you do not have the
+                                <code>GROUP_EXECUTIVES</code> role and so throws
+                                an <code>javax.ejb.EJBAccessException</code>
+                            </p>
+                        </td>
+                    </tr>
+                    
+                    
+                    <tr class="order-table-even-row">
+                        <td>
+                            <!-- column header -->
+                            <!-- row record -->
+                            <h:outputLink value="#{request.contextPath}/standard/customersupport/help">
+                                CustomerSupport REST Service...<br/><br/>(Standard Config)
+                            </h:outputLink>
+                        </td>
+                        <td style="background-color: red;">
+                            NO
+                        </td>
+                        <td>
+                            <!-- column header -->
+                            <!-- row record -->
+                            <p>
+                                This link calls the CustomerSupport REST service to get 
+                                help details. It is protected by 
+                                <code>@RolesAllowed({"GROUP_CUSTOMER_SUPPORTS"})</code>.
+                                You <b>have</b> this role, so you <b>should</b> be able to
+                                access it.
+                            </p>
+                            <p>
+                                I say this link is not working because when you click it
+                                you get an 500 - Internal Server Error code caused by
+                                an <code>javax.ejb.EJBAccessException</code>. This isn't
+                                right.  You should be able to access this because you
+                                have the right role.
+                            </p>
+                            <p>
+                                So here is what I think is going on...
+                            </p>
+                            <p>
+                                1st, this link uses the JAX-RS stanard application configuration 
+                                (<code>javax.ws.rs.core.Application</code>).  Because
+                                standard JAX-RS does not support <code>@RolesAllowed</code>,
+                                JAX-RS does nothing to stop the method call.
+                                <br/><br/>
+                                2nd, because the CustomerSupport REST service is also
+                                a <code>@Stateless</code> EJB, the EJB container is
+                                next and it tries to execute the code.  The EJB container
+                                definately supports <code>@RolesAllowed</code> so it
+                                will try to get the prinicapl to check it.  Because
+                                I'm getting an  <code>javax.ejb.EJBAccessException</code>,
+                                this tells me the EJB container isn't finding the right
+                                principal or roles. I can kind of understand this
+                                being the case because The custom <code>SecurityContext</code> is
+                                created in a JAX-RS filter, which isn't really integrated
+                                into the EE server.  So my guess is that this context isn't 
+                                propagated correctly to the EJB container, so the
+                                EJB container fails the call with an 
+                                <code>javax.ejb.EJBAccessException</code>.
+                            </p>
                         </td>
                     </tr>
                     
                     
                 </tbody>
             </table>
-
-
-            
+        </blockquote>
+        
+        
+        <p>
+            <b>Final Thoughts</b>
+        </p>
+        <blockquote>
             <p>
-                <h:outputLink value="#{request.contextPath}/standard/customersupport/help">
-                    Standard link: Customer support help REST resource...you have GROUP_CUSTOMER_SUPPORTS :)
+                There is a lot going on here and it's hard to figure out if things are working.  The final 
+                test with the 
+                <h:outputLink value="#{request.contextPath}/standard/executive/contract">
+                    Executive REST Service...<br/><br/>(Standard Config)
+                </h:outputLink> 
+                really makes it clear that doing this trick with creating
+                a custom <code>SecurityContext</code> in a JAX-RS filter just doesn't
+                plug into the EE server like you would expected.  For the
+                <h:outputLink value="#{request.contextPath}/standard/executive/contract">
+                    Executive REST Service...<br/><br/>(Standard Config)
                 </h:outputLink>
-            </p>
-            <p>
-                
-            </p>
-            <p>
-                
+                test, you have the appropriate role but are not able to access
+                the REST endpoint.  So if you look at the <span style="background-color: yellow">Maybe</span>s
+                above and think about what's going on between the interation of the JAX-RS
+                filter, the custom <code>SecurityContext</code>, and the EJB container, 
+                it's pretty clear this doesn't work.
             </p>
         </blockquote>
     </ui:define>
