@@ -6,26 +6,33 @@
         [DONE] 01. Inject a bean without a beans.xml file?
         Can @Inject be used to inject a bean
         into a JAX-RS endpoint if the project does NOT
-        have a beans.xml file?
+        have a beans.xml file? - NO...caution for GlassFish Implicit CDI option
         
-        [DONE] 02. Inject a bean
+        [DONE] 02. Inject a bean with a beans.xml file?
         Can @Inject be used to inject a bean
         into a JAX-RS endpoint if the project DOES
-        have a beans.xml file?
+        have a beans.xml file? - YES
         
         [DONE] 03.a Custom SecurityContext protect non-EJB JAX-RS endpoint?
         Can a JAX-RS filter and custom SecurityContext protect
         a JAX-RS endpoint which is NOT an EJB using
         @RolesAllowed, @DeclaredRoles, and identity management
-        groups in glassfish-web.xml
+        groups in glassfish-web.xml - YES
         
         [DONE] 03.b Custom SecurityContext protect EJB JAX-RS endpoint?
         Can a JAX-RS filter and custom SecurityContext protect
         a JAX-RS endpoint which IS an EJB using
         @RolesAllowed, @DeclaredRoles, and identity management
-        groups in glassfish-web.xml
+        groups in glassfish-web.xml - NO, this doesn't integrate well
         
-        [DONE] 04 Custom SecurityContext passed to EJB?        
+        [DONE] 04 Custom SecurityContext passed to EJB?
+        If I have an EJB protected by @DeclareRoles,
+        @RolesAllowed, and with identity-management 
+        groups in glassfish-web.xml, will a call
+        to an <b>unprotected</b> JAX-RS endpoint with a 
+        custom SecurityContext propagate
+        the principal to the EJB container so security can
+        be applied?        
     -->
     
     

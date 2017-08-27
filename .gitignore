@@ -5,3 +5,4 @@
 /02-jaxrs-inject-beansxml/target/
 /03-jaxrs-protected-customsecuritycontext-non_ejb-endpoint/target/
 /03-jaxrs-protected-customsecuritycontext-ejb-endpoint/target/
+/04-jaxrs-protected-customsecuritycontext-ejb-integration/target/
